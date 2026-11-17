@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 @import "tailwindcss";
 
@@ -10,3 +11,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #f8fafc;
 }
+=======
+@tailwind base
+@tailwind components
+@tailwind utilities
+>>>>>>> 6123f0da7dcf619fb9c2fd535e7a1d5e329a021f
