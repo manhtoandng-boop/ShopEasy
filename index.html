@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShopEasy - Mua sắm công nghệ trực tuyến.">
+    <title>ShopEasy - Mua sắm thông minh</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="#" class="logo" onclick="showPage('home')">ShopEasy</a>
+
+            <nav>
+                <a href="#" onclick="showPage('home')">Trang chủ</a>
+                <a href="#products" onclick="showPage('home')">Sản phẩm</a>
+                <a href="#" onclick="showPage('cart')">
+                    Giỏ hàng (<span id="cart-count">0</span>)
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Trang chủ -->
+        <section id="home-page">
+            <div class="hero">
+                <h1>Mua sắm thông minh cùng ShopEasy</h1>
+                <p>Khám phá các sản phẩm công nghệ chất lượng.</p>
+                <button onclick="document.getElementById('products').scrollIntoView()">
+                    Mua sắm ngay
+                </button>
+            </div>
+
+            <section id="products">
+                <h2>Sản phẩm nổi bật</h2>
+
+                <input
+                    type="search"
+                    id="search-input"
+                    placeholder="Tìm kiếm sản phẩm..."
+                >
+
+                <div class="categories">
+                    <button onclick="filterProducts('Tất cả')">Tất cả</button>
+                    <button onclick="filterProducts('Âm thanh')">Âm thanh</button>
+                    <button onclick="filterProducts('Phụ kiện')">Phụ kiện</button>
+                    <button onclick="filterProducts('Máy tính')">Máy tính</button>
+                </div>
+
+                <div id="product-list" class="product-grid">
+                    Đang tải sản phẩm...
+                </div>
+            </section>
+        </section>
+
+        <!-- Trang giỏ hàng -->
+        <section id="cart-page" hidden>
+            <h2>Giỏ hàng của bạn</h2>
+            <div id="cart-items"></div>
+            <h3>Tổng tiền: <span id="cart-total">0 ₫</span></h3>
+            <button onclick="showPage('home')">Tiếp tục mua sắm</button>
+            <button onclick="showPage('checkout')">Thanh toán</button>
+        </section>
+
+        <!-- Trang thanh toán -->
+        <section id="checkout-page" hidden>
+            <h2>Thông tin thanh toán</h2>
+
+            <form id="checkout-form">
+                <label for="customer-name">Họ và tên</label>
+                <input id="customer-name" type="text" required>
+
+                <label for="customer-phone">Số điện thoại</label>
+                <input id="customer-phone" type="tel" required>
+
+                <label for="customer-email">Email</label>
+                <input id="customer-email" type="email" required>
+
+                <label for="customer-address">Địa chỉ giao hàng</label>
+                <textarea id="customer-address" required></textarea>
+
+                <label for="payment-method">Phương thức thanh toán</label>
+                <select id="payment-method" required>
+                    <option value="Thanh toán khi nhận hàng">
+                        Thanh toán khi nhận hàng (COD)
+                    </option>
+                    <option value="Chuyển khoản ngân hàng">
+                        Chuyển khoản ngân hàng
+                    </option>
+                </select>
+
+                <button type="submit" id="place-order-button">
+                    Đặt hàng
+                </button>
+            </form>
+
+            <p id="checkout-message"></p>
+        </section>
+
+        <!-- Trang đặt hàng thành công -->
+        <section id="success-page" hidden>
+            <h2>Đặt hàng thành công!</h2>
+            <p>Cảm ơn bạn đã mua sắm tại ShopEasy.</p>
+            <p>Mã đơn hàng: <strong id="success-order-code"></strong></p>
+            <button onclick="showPage('home')">Tiếp tục mua sắm</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 ShopEasy. Mua sắm thông minh.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
