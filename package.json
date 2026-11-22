@@ -1,9 +1,6 @@
+
 {
-<<<<<<< HEAD
   "name": "shopeasy",
-=======
-  "name": "shopeasy-prototype",
->>>>>>> 6123f0da7dcf619fb9c2fd535e7a1d5e329a021f
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@tailwindcss/vite": "^4.3.4",
     "lucide-react": "^1.70.0",
     "react": "^19.3.1",
@@ -32,19 +28,5 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "vite": "^8.3.6"
-=======
-    "lucide-react": "^1.70.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.3",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "vite": "^5.3.1"
->>>>>>> 6123f0da7dcf619fb9c2fd535e7a1d5e329a021f
   }
 }
