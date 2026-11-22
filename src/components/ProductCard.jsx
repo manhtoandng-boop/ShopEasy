@@ -1,9 +1,24 @@
+
 import { ShoppingCart, Star } from "lucide-react";
 import { formatVND } from "../data/products";
 import { useCart } from "../context/CartContext";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+
+  const discountPercent = Number(product.discount_percent) || 0;
+  const originalPrice = Number(product.price);
+
+  const finalPrice = Math.round(
+    originalPrice * (1 - discountPercent / 100)
+  );
+
+  const discountedProduct = {
+    ...product,
+    originalPrice,
+    price: finalPrice,
+    discount_percent: discountPercent,
+  };
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition">
@@ -14,9 +29,17 @@ export default function ProductCard({ product }) {
           className="w-full h-52 object-cover"
         />
 
-        <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded">
-          {product.tag}
-        </span>
+        {product.tag && (
+          <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded">
+            {product.tag}
+          </span>
+        )}
+
+        {discountPercent > 0 && (
+          <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded">
+            -{discountPercent}%
+          </span>
+        )}
       </div>
 
       <div className="p-4">
@@ -41,12 +64,20 @@ export default function ProductCard({ product }) {
         </div>
 
         <div className="flex justify-between items-center mt-4 gap-2">
-          <span className="font-black text-blue-600">
-            {formatVND(product.price)}
-          </span>
+          <div className="flex flex-col">
+            {discountPercent > 0 && (
+              <span className="text-xs text-slate-400 line-through">
+                {formatVND(originalPrice)}
+              </span>
+            )}
+
+            <span className="font-black text-blue-600">
+              {formatVND(finalPrice)}
+            </span>
+          </div>
 
           <button
-            onClick={() => addToCart(product)}
+            onClick={() => addToCart(discountedProduct)}
             className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg"
             aria-label="Thêm vào giỏ hàng"
           >

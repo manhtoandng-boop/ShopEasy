@@ -8,7 +8,7 @@ const db = require("../config/database");
 router.get("/", async (req, res) => {
     try {
         const [products] = await db.execute(
-            "SELECT * FROM products ORDER BY id ASC"
+            "SELECT * FROM products WHERE id BETWEEN 343 AND 392 ORDER BY id ASC"
         );
 
         res.json({
@@ -42,7 +42,7 @@ router.get("/:id", async (req, res) => {
         }
 
         const [products] = await db.execute(
-            "SELECT * FROM products WHERE id = ?",
+            "SELECT * FROM products WHERE id = ? AND id BETWEEN 343 AND 392",
             [productId]
         );
 

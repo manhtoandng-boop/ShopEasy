@@ -1,7 +1,10 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { formatVND } from "../data/products";
+
+const API_URL = "http://localhost:3000/api";
 
 export default function Checkout() {
   const { cart, total, clearCart } = useCart();
@@ -10,11 +13,13 @@ export default function Checkout() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
     paymentMethod: "cod"
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -23,16 +28,17 @@ export default function Checkout() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (cart.length === 0) {
       setError("Giỏ hàng đang trống.");
       return;
     }
 
-    if (!/^(0|\+84)[0-9]{9,10}$/.test(form.phone.trim())) {
-      setError("Số điện thoại không hợp lệ.");
+    if (!/^[0-9]{10,11}$/.test(form.phone.trim())) {
+      setError("Số điện thoại phải có 10 hoặc 11 chữ số.");
       return;
     }
 
@@ -41,19 +47,71 @@ export default function Checkout() {
       return;
     }
 
-    const order = {
-      ...form,
-      items: cart,
-      total,
-      orderCode: "SE" + Date.now()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setError("Email không hợp lệ.");
+      return;
+    }
+
+    const orderData = {
+      customer_name: form.name.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim(),
+      address: form.address.trim(),
+      payment_method:
+        form.paymentMethod === "cod"
+          ? "Thanh toán khi nhận hàng"
+          : "Chuyển khoản ngân hàng",
+      items: cart.map((item) => ({
+        product_id: item.id,
+        quantity: item.quantity
+      }))
     };
 
-    // Demo: lưu đơn hàng trong trình duyệt.
-    // Sẽ thay bằng API Backend ở giai đoạn tiếp theo.
-    localStorage.setItem("shopeasy-last-order", JSON.stringify(order));
+    try {
+      setLoading(true);
 
-    clearCart();
-    navigate("/success");
+      const response = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Không thể tạo đơn hàng."
+        );
+      }
+
+      const order = {
+        orderCode: data.order.order_code,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        address: form.address.trim(),
+        paymentMethod: form.paymentMethod,
+        total: Number(data.order.total_amount),
+        status: data.order.status
+      };
+
+      localStorage.setItem(
+        "shopeasy-last-order",
+        JSON.stringify(order)
+      );
+
+      clearCart();
+      navigate("/success");
+
+    } catch (err) {
+      setError(
+        err.message || "Không thể kết nối đến máy chủ."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -62,6 +120,7 @@ export default function Checkout() {
         <h2 className="text-2xl font-bold">
           Bạn chưa có sản phẩm để thanh toán.
         </h2>
+
         <Link to="/" className="text-blue-600 mt-4 inline-block">
           Quay lại mua sắm
         </Link>
@@ -81,6 +140,7 @@ export default function Checkout() {
             <label className="block text-sm font-semibold mb-2">
               Họ và tên *
             </label>
+
             <input
               name="name"
               value={form.name}
@@ -95,6 +155,7 @@ export default function Checkout() {
             <label className="block text-sm font-semibold mb-2">
               Số điện thoại *
             </label>
+
             <input
               name="phone"
               type="tel"
@@ -108,8 +169,25 @@ export default function Checkout() {
 
           <div>
             <label className="block text-sm font-semibold mb-2">
+              Email *
+            </label>
+
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full border rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="example@gmail.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">
               Địa chỉ nhận hàng *
             </label>
+
             <textarea
               name="address"
               value={form.address}
@@ -150,22 +228,31 @@ export default function Checkout() {
           </div>
 
           {error && (
-            <p className="text-red-600 text-sm">{error}</p>
+            <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+              {error}
+            </div>
           )}
 
           <div className="border-t pt-5">
             <div className="flex justify-between font-bold mb-5">
-              <span>Tổng thanh toán</span>
+              <span>Tổng thanh toán tạm tính</span>
+
               <span className="text-blue-600 text-xl">
                 {formatVND(total)}
               </span>
             </div>
 
+            <p className="text-sm text-slate-500 mb-4">
+              Tổng tiền chính thức sẽ được Backend tính lại
+              dựa trên giá và tồn kho trong cơ sở dữ liệu.
+            </p>
+
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              Xác nhận đặt hàng
+              {loading ? "Đang xử lý đơn hàng..." : "Xác nhận đặt hàng"}
             </button>
           </div>
         </form>

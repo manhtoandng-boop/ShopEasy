@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -10,6 +11,14 @@ export default function Cart() {
     updateQuantity,
     removeFromCart
   } = useCart();
+
+  const originalTotal = cart.reduce(
+    (sum, item) =>
+      sum + Number(item.originalPrice ?? item.price) * item.quantity,
+    0
+  );
+
+  const savings = originalTotal - total;
 
   if (cart.length === 0) {
     return (
@@ -37,67 +46,109 @@ export default function Cart() {
       </h1>
 
       <div className="bg-white rounded-2xl border p-5">
-        {cart.map((item) => (
-          <div
-            key={item.id}
-            className="flex flex-col sm:flex-row items-center justify-between gap-4 py-5 border-b last:border-0"
-          >
-            <div className="flex items-center gap-4 w-full">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-20 h-20 object-cover rounded-xl"
-              />
+        {cart.map((item) => {
+          const originalPrice = Number(
+            item.originalPrice ?? item.price
+          );
 
-              <div>
-                <h3 className="font-bold">{item.name}</h3>
-                <p className="text-blue-600 font-semibold mt-2">
-                  {formatVND(item.price)}
-                </p>
+          const salePrice = Number(item.price);
+
+          const isDiscounted = salePrice < originalPrice;
+
+          return (
+            <div
+              key={item.id}
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 py-5 border-b last:border-0"
+            >
+              <div className="flex items-center gap-4 w-full">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-20 h-20 object-cover rounded-xl"
+                />
+
+                <div>
+                  <h3 className="font-bold">{item.name}</h3>
+
+                  {isDiscounted && (
+                    <p className="text-sm text-slate-400 line-through mt-1">
+                      {formatVND(originalPrice)}
+                    </p>
+                  )}
+
+                  <p className="text-blue-600 font-semibold mt-1">
+                    {formatVND(salePrice)}
+                  </p>
+
+                  {isDiscounted && (
+                    <span className="text-xs text-red-500 font-semibold">
+                      Tiết kiệm {formatVND(originalPrice - salePrice)}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center border rounded-lg">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center border rounded-lg">
+                  <button
+                    onClick={() =>
+                      updateQuantity(item.id, item.quantity - 1)
+                    }
+                    className="p-2"
+                    aria-label="Giảm số lượng"
+                  >
+                    <Minus size={16} />
+                  </button>
+
+                  <span className="px-3 font-bold">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      updateQuantity(item.id, item.quantity + 1)
+                    }
+                    className="p-2"
+                    aria-label="Tăng số lượng"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+
                 <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="p-2"
-                  aria-label="Giảm số lượng"
+                  onClick={() => removeFromCart(item.id)}
+                  className="text-red-500 p-2"
+                  aria-label="Xóa sản phẩm"
                 >
-                  <Minus size={16} />
-                </button>
-
-                <span className="px-3 font-bold">
-                  {item.quantity}
-                </span>
-
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="p-2"
-                  aria-label="Tăng số lượng"
-                >
-                  <Plus size={16} />
+                  <Trash2 size={18} />
                 </button>
               </div>
 
-              <button
-                onClick={() => removeFromCart(item.id)}
-                className="text-red-500 p-2"
-                aria-label="Xóa sản phẩm"
-              >
-                <Trash2 size={18} />
-              </button>
+              <p className="font-bold min-w-32 text-right">
+                {formatVND(salePrice * item.quantity)}
+              </p>
             </div>
-
-            <p className="font-bold min-w-32 text-right">
-              {formatVND(item.price * item.quantity)}
-            </p>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
           <div>
-            <p className="text-slate-500 text-sm">Tổng thanh toán</p>
+            <p className="text-slate-500 text-sm">
+              Tổng thanh toán
+            </p>
+
+            {savings > 0 && (
+              <>
+                <p className="text-sm text-slate-400 line-through">
+                  {formatVND(originalTotal)}
+                </p>
+
+                <p className="text-sm text-green-600 font-semibold">
+                  Bạn tiết kiệm {formatVND(savings)}
+                </p>
+              </>
+            )}
+
             <p className="text-2xl font-black text-blue-600">
               {formatVND(total)}
             </p>

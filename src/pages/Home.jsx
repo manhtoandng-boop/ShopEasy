@@ -1,15 +1,53 @@
-import { useMemo, useState } from "react";
-import { PRODUCTS } from "../data/products";
+
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { ArrowRight, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 const CATEGORIES = ["Tất cả", "Âm thanh", "Phụ kiện", "Máy tính"];
 
-export default function Home({ search }) {
+export default function Home({ search = "" }) {
+  const { syncCartProducts } = useCart();
   const [category, setCategory] = useState("Tất cả");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch("http://localhost:3000/api/products");
+
+        if (!response.ok) {
+          throw new Error("Không thể tải danh sách sản phẩm.");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || "Lỗi tải sản phẩm.");
+        }
+
+        const latestProducts = data.products || [];
+
+	syncCartProducts(latestProducts);
+	setProducts(latestProducts);
+
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       const matchCategory =
         category === "Tất cả" || product.category === category;
 
@@ -19,11 +57,10 @@ export default function Home({ search }) {
 
       return matchCategory && matchSearch;
     });
-  }, [category, search]);
+  }, [products, category, search]);
 
   return (
     <>
-      {/* Hero */}
       <section className="bg-gradient-to-r from-blue-700 to-sky-500 text-white">
         <div className="max-w-7xl mx-auto px-4 py-20">
           <div className="max-w-2xl">
@@ -50,7 +87,6 @@ export default function Home({ search }) {
         </div>
       </section>
 
-      {/* Benefits */}
       <section className="bg-white border-b">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 p-6 text-center">
           <div className="flex items-center justify-center gap-3">
@@ -70,7 +106,6 @@ export default function Home({ search }) {
         </div>
       </section>
 
-      {/* Products */}
       <section id="products" className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
           <div>
@@ -87,7 +122,6 @@ export default function Home({ search }) {
           </span>
         </div>
 
-        {/* Category filters */}
         <div className="flex flex-wrap gap-3 mb-8">
           {CATEGORIES.map((item) => (
             <button
@@ -104,8 +138,15 @@ export default function Home({ search }) {
           ))}
         </div>
 
-        {/* Product list */}
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-16 text-blue-600">
+            Đang tải sản phẩm...
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 text-red-500">
+            {error}
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />

@@ -1,3 +1,4 @@
+
 import { Link, Navigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { formatVND } from "../data/products";
@@ -13,7 +14,7 @@ export default function OrderSuccess() {
     order = null;
   }
 
-  if (!order) {
+  if (!order || !order.orderCode) {
     return <Navigate to="/" replace />;
   }
 
@@ -50,6 +51,10 @@ export default function OrderSuccess() {
           </p>
 
           <p>
+            Email: <strong>{order.email}</strong>
+          </p>
+
+          <p>
             Địa chỉ: <strong>{order.address}</strong>
           </p>
 
@@ -57,9 +62,13 @@ export default function OrderSuccess() {
             Thanh toán:{" "}
             <strong>
               {order.paymentMethod === "cod"
-                ? "COD"
-                : "Chuyển khoản"}
+                ? "Thanh toán khi nhận hàng (COD)"
+                : "Chuyển khoản ngân hàng"}
             </strong>
+          </p>
+
+          <p>
+            Trạng thái: <strong>{order.status || "Pending"}</strong>
           </p>
 
           <div className="border-t pt-3 flex justify-between">
