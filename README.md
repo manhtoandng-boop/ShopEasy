@@ -54,3 +54,19 @@ ShopEasy uses a relational MySQL database to manage products, customer orders, o
 - Foreign keys maintain relationships between related records.
 - Product discounts are stored in `discount_percent`.
 - The database uses MySQL with InnoDB and utf8mb4.
+
+## Project Documentation
+
+The following documents describe the project planning, database structure, and development process.
+
+| Document | Description |
+|---|---|
+| [Project Plan](docs/project-plan.md) | Project scope, objectives, responsibilities, five-sprint timeline, and development workflow. |
+| [Entity Relationship Diagram](docs/ERD.md) | Database entities, primary keys, foreign keys, and relationships. |
+| [Database Schema](database/schema.sql) | SQL definitions for the main database tables. |
+
+## Project Repository
+
+- [GitHub Repository](https://github.com/manhtoandng-boop/ShopEasy)
+- [GitHub Issues](https://github.com/manhtoandng-boop/ShopEasy/issues)
+- [GitHub Pull Requests](https://github.com/manhtoandng-boop/ShopEasy/pulls)
