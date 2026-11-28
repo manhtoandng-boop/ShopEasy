@@ -1,4 +1,4 @@
-# React + Vite
+﻿# React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -14,3 +14,43 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+---
+
+# ShopEasy - Online Shopping Website
+
+ShopEasy is an online shopping website developed as a final project for the Web Design and Development course (CSB25022).
+
+## Technologies
+
+- Frontend: React, Vite, Tailwind CSS
+- Backend: Node.js, Express.js
+- Database: MySQL
+- Version control: Git and GitHub
+
+## Database Design
+
+ShopEasy uses a relational MySQL database to manage products, customer orders, order items, and payment records.
+
+### Database schema
+
+- [View database schema](database/schema.sql)
+
+### Entity Relationship Diagram (ERD)
+
+- [View Entity Relationship Diagram](docs/ERD.md)
+
+### Main relationships
+
+| Relationship | Description |
+|---|---|
+| Orders - Order Items | One order can contain multiple order items. |
+| Products - Order Items | A product can appear in multiple order items. |
+| Orders - Payments | One order can have multiple payment records. |
+
+### Database notes
+
+- Primary keys uniquely identify records in each table.
+- Foreign keys maintain relationships between related records.
+- Product discounts are stored in `discount_percent`.
+- The database uses MySQL with InnoDB and utf8mb4.
